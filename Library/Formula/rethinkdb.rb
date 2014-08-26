@@ -1,4 +1,4 @@
-require "formula"
+require 'formula'
 
 class Rethinkdb < Formula
   homepage "http://www.rethinkdb.com/"
