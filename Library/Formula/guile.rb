@@ -5,11 +5,13 @@ class Guile < Formula
   url 'http://ftpmirror.gnu.org/guile/guile-2.0.11.tar.gz'
   mirror 'http://ftp.gnu.org/gnu/guile/guile-2.0.11.tar.gz'
   sha1 '3cdd1c4956414bffadea13e5a1ca08949016a802'
+  revision 1
 
   bottle do
-    sha1 "3a75eeaa7a1637dd9876636963d8f02a6ffb23bf" => :mavericks
-    sha1 "6828352dd9205c9fa42701f14d7808604b7b23e1" => :mountain_lion
-    sha1 "e223036d6e1e238802a421d266881ad5ddf14c16" => :lion
+    revision 1
+    sha1 "67bd9b8050bded7916db3622d7abd896e1376eac" => :yosemite
+    sha1 "818e7ac90634b60bcbf44509a512b542b0a87bd8" => :mavericks
+    sha1 "55790b96275804b2e5952b60e1071a318f3b1518" => :mountain_lion
   end
 
   head do

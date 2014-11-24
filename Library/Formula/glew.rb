@@ -7,17 +7,27 @@ class Glew < Formula
 
   bottle do
     cellar :any
-    sha1 "45a06a30935d2c707f389da25ba45e1169801480" => :mavericks
-    sha1 "01928578947d9c3d98ae2ec78e43aec837854a0a" => :mountain_lion
-    sha1 "d7c6a1a25c3d55230be4c977ebb6774840926d3a" => :lion
+    revision 2
+    sha1 "0f140259d5cb5525153b32102220432fefba1bee" => :yosemite
+    sha1 "ab31a942adaf43f20cea1fd39d1a04949615c2de" => :mavericks
+    sha1 "0ea8a4b4ec385c39eb52732ce8527f68410e35da" => :mountain_lion
   end
+
+  option :universal
 
   def install
     # Makefile directory race condition on lion
     ENV.deparallelize
 
+    if build.universal?
+      ENV.universal_binary
+
+      # Do not strip resulting binaries; https://sourceforge.net/p/glew/bugs/259/
+      ENV["STRIP"] = ""
+    end
+
     inreplace "glew.pc.in", "Requires: @requireslib@", ""
-    system "make", "GLEW_DEST=#{prefix}", "all"
-    system "make", "GLEW_DEST=#{prefix}", "install.all"
+    system "make", "GLEW_PREFIX=#{prefix}", "GLEW_DEST=#{prefix}", "all"
+    system "make", "GLEW_PREFIX=#{prefix}", "GLEW_DEST=#{prefix}", "install.all"
   end
 end

@@ -2,15 +2,14 @@ require "formula"
 
 class Profanity < Formula
   homepage "http://www.profanity.im/"
-  url "http://www.profanity.im/profanity-0.4.3.tar.gz"
-  sha1 "ecd99eba84ad149941491c17c7f69a77fc20de5e"
+  url "http://www.profanity.im/profanity-0.4.5.tar.gz"
+  sha1 "d9eb1b9d6a674d5f49e03882f80d1c5cf98c3ce1"
   head "https://github.com/boothj5/profanity.git"
-  revision 1
 
   bottle do
-    sha1 "7dcef1770b0ac01814677f714fd7a8d5568cbf34" => :mavericks
-    sha1 "26843e609428afb61e0df4b0d2075d09d4ae0d2e" => :mountain_lion
-    sha1 "8dc3cc76203dab0fbd6a2b7ff47a88b8a3bb64b2" => :lion
+    sha1 "f53fc5631fa1b079414420275278e55d6225798d" => :yosemite
+    sha1 "240feb4c76b4ddb3170792710fa011cb90c302d4" => :mavericks
+    sha1 "2c5d854f76597d6b0aa55f4daad3aad3027f3bc4" => :mountain_lion
   end
 
   depends_on "autoconf" => :build
@@ -25,8 +24,7 @@ class Profanity < Formula
 
   def install
     system "./bootstrap.sh"
-    system "./configure", "--disable-debug",
-                          "--disable-dependency-tracking",
+    system "./configure", "--disable-dependency-tracking",
                           "--disable-silent-rules",
                           "--prefix=#{prefix}"
     system "make", "install"

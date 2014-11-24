@@ -1,24 +1,31 @@
-require 'formula'
+require "formula"
 
 class Rethinkdb < Formula
   homepage "http://www.rethinkdb.com/"
-  url 'http://download.rethinkdb.com/dist/rethinkdb-1.14.0.tgz"
-  sha1 "508b33661b9804ebd265484ad558abc86ae20815"
+  url "http://download.rethinkdb.com/dist/rethinkdb-1.15.2.tgz"
+  sha1 "31c14c764355e555734c7f4479397bd3bd7e0e44"
 
   bottle do
-    revision 1
-    sha1 "596f771d45a1dfddc929e5def9d4d8361aac73f4" => :mavericks
-    sha1 "6eebbd619c542582d63e922701e4e6c705f4dbdc" => :mountain_lion
-    sha1 "4038e3599d6a44d993429bef671e8e2b9625ddf6" => :lion
+    sha1 "2710231d7a0013779e2d61228aa0395e8261611f" => :yosemite
+    sha1 "c8c7f4e2d05535953de0ba229ac3c12ac11de8b9" => :mavericks
+    sha1 "bcbdc4b123365987dd5ce6f6cc0f628302d95e3c" => :mountain_lion
   end
 
   depends_on :macos => :lion
+  # Embeds an older V8, whose gyp still requires the full Xcode
+  # Reported upstream: https://github.com/rethinkdb/rethinkdb/issues/2581
+  depends_on :xcode => :build
   depends_on "boost" => :build
+  depends_on "openssl"
 
   fails_with :gcc do
     build 5666 # GCC 4.2.1
     cause "RethinkDB uses C++0x"
   end
+
+  # boost 1.56 compatibility
+  # https://github.com/rethinkdb/rethinkdb/issues/3044#issuecomment-55478774
+  patch :DATA
 
   def install
     args = ["--prefix=#{prefix}"]
@@ -29,6 +36,10 @@ class Rethinkdb < Formula
     # rethinkdb requires that protobuf be linked against libc++
     # but brew's protobuf is sometimes linked against libstdc++
     args += ["--fetch", "protobuf"]
+
+    # support gcc with boost 1.56
+    # https://github.com/rethinkdb/rethinkdb/issues/3044#issuecomment-55471981
+    args << "CXXFLAGS=-DBOOST_VARIANT_DO_NOT_USE_VARIADIC_TEMPLATES"
 
     system "./configure", *args
     system "make"

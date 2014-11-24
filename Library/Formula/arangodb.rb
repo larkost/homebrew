@@ -2,28 +2,21 @@ require 'formula'
 
 class Arangodb < Formula
   homepage 'http://www.arangodb.org/'
-  url 'https://www.arangodb.org/repositories/Source/ArangoDB-2.2.2.tar.gz'
-  sha1 '4af0d233202ee4fd482564200d645abddb936cda'
+  url 'https://www.arangodb.com/repositories/Source/ArangoDB-2.3.0.tar.gz'
+  sha1 '610135105ccc8672715bea37b9b2405f32e57f8c'
 
   head "https://github.com/triAGENS/ArangoDB.git", :branch => 'unstable'
 
   bottle do
-    sha1 "d53bb13947f9f84f151da237352cfe24a939baa3" => :mavericks
-    sha1 "8a999e9a55536a3fc65d72a4e049566625471017" => :mountain_lion
-    sha1 "aedc89297f0433ef454c501b384b266e98b85f99" => :lion
+    sha1 "b71193d1af10ea161baefcc055935b7697cb0b7e" => :yosemite
+    sha1 "3d7f94564e2dab164e25eb1660d8b14a21dbb7cb" => :mavericks
+    sha1 "7f691ca2e09f83845a07ebe490dd6c31944b7e97" => :mountain_lion
   end
 
   depends_on 'go' => :build
+  depends_on 'openssl'
 
   needs :cxx11
-
-  def suffix
-    if build.stable?
-      return ""
-    else
-      return "-" + (build.devel? ? version : "unstable")
-    end
-  end
 
   def install
     # clang on 10.8 will still try to build against libstdc++,
@@ -48,8 +41,9 @@ class Arangodb < Formula
       --enable-mruby
       --datadir=#{share}
       --localstatedir=#{var}
-      --program-suffix=#{suffix}
     ]
+
+    args << "--program-suffix=unstable" if build.head?
 
     system "./configure", *args
     system "make install"

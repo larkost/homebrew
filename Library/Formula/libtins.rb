@@ -2,25 +2,27 @@ require "formula"
 
 class Libtins < Formula
   homepage "https://libtins.github.io/"
-  url "https://github.com/mfontanini/libtins/archive/v3.0.tar.gz"
-  sha1 "0e8a31dde9ba9ec55cc4c6d3142fe4e3912598e3"
+  url "https://github.com/mfontanini/libtins/archive/v3.1.tar.gz"
+  sha1 "8047e87ba90f784d7022980c7351b616d43d4fba"
   head "https://github.com/mfontanini/libtins.git"
 
   bottle do
-    cellar :any
-    sha1 "1312df6edac4a92790adba7184f73c65aaec376f" => :mavericks
-    sha1 "66dc536e0612a5e66192e8ecb34f2c5e9cb9ed3d" => :mountain_lion
-    sha1 "90b958acd1b71c96d99c0292a22731933a6ee456" => :lion
+    revision 1
+    sha1 "3f7a5a404ce751fe953100f8a282490dec1eed2a" => :yosemite
+    sha1 "316b0d0b1255f9aa25b257a29f1900c49ec09046" => :mavericks
+    sha1 "85fb8ad451c673cb5cc918294e563525a95824ae" => :mountain_lion
   end
 
   option :cxx11
 
+  depends_on "cmake" => :build
+
   def install
     ENV.cxx11 if build.cxx11?
-    args = ["--prefix=#{prefix}"]
-    args << "--enable-c++11" if build.cxx11?
+    args = std_cmake_args
+    args << "-DLIBTINS_ENABLE_CXX11=1" if build.cxx11?
 
-    system "./configure", *args
+    system "cmake", ".", *args
     system "make", "install"
     doc.install "examples"
   end

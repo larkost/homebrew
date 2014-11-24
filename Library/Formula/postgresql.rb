@@ -8,9 +8,7 @@ class Postgresql < Formula
     url "http://ftp.postgresql.org/pub/source/v9.3.5/postgresql-9.3.5.tar.bz2"
     sha256 "14176ffb1f90a189e7626214365be08ea2bfc26f26994bafb4235be314b9b4b0"
 
-    # ossp-uuid support cannot be compiled on 9.4beta1:
-    # http://thread.gmane.org/gmane.comp.db.postgresql.devel.general/229339
-    # Will keep it stable-only until the usptream issues are resolved.
+    # ossp-uuid is no longer required for uuid support since 9.4beta2:
     depends_on "ossp-uuid" => :recommended
     # Fix uuid-ossp build issues: http://archives.postgresql.org/pgsql-general/2012-07/msg00654.php
     patch :DATA
@@ -18,15 +16,15 @@ class Postgresql < Formula
 
   bottle do
     revision 1
+    sha1 "00d8f44111b8585fc2fa045fb33098cde3bcf230" => :yosemite
     sha1 "d298f4cd7fffa6b8b879ccc2c6d32fc191be41ed" => :mavericks
     sha1 "c5c5d23e95c1950d4b33865b8ebdce28b4e6706f" => :mountain_lion
     sha1 "860395322283401cfc1d0694984c272546f21fa9" => :lion
   end
 
   devel do
-    url 'http://ftp.postgresql.org/pub/source/v9.4beta2/postgresql-9.4beta2.tar.bz2'
-    version '9.4beta2'
-    sha256 '567406cf58386917916d8ef7ac892bf79e98742cd16909bb00fc920dd31a388c'
+    url 'http://ftp.postgresql.org/pub/source/v9.4rc1/postgresql-9.4rc1.tar.bz2'
+    sha256 '6ce91d78fd6c306536f5734dbaca10889814b9d0fe0b38a41b3e635d95241c7c'
   end
 
   option '32-bit'
@@ -67,19 +65,31 @@ class Postgresql < Formula
 
     args << "--with-python" if build.with? 'python'
     args << "--with-perl" unless build.include? 'no-perl'
-    args << "--with-tcl" unless build.include? 'no-tcl'
+
+    # The CLT is required to build tcl support on 10.7 and 10.8 because
+    # tclConfig.sh is not part of the SDK
+    unless build.include?("no-tcl") || MacOS.version < :mavericks && MacOS::CLT.installed?
+      args << "--with-tcl"
+
+      if File.exist?("#{MacOS.sdk_path}/usr/lib/tclConfig.sh")
+        args << "--with-tclconfig=#{MacOS.sdk_path}/usr/lib"
+      end
+    end
+
     args << "--enable-dtrace" if build.include? 'enable-dtrace'
 
-    if build.stable? && build.with?("ossp-uuid")
+    if build.with?("ossp-uuid")
       args << "--with-ossp-uuid"
       ENV.append 'CFLAGS', `uuid-config --cflags`.strip
       ENV.append 'LDFLAGS', `uuid-config --ldflags`.strip
       ENV.append 'LIBS', `uuid-config --libs`.strip
+    elsif build.devel?
+      # Apple's UUID implementation is compatible with e2fs NOT bsd
+      args << "--with-uuid=e2fs"
     end
 
     if build.build_32_bit?
-      ENV.append 'CFLAGS', "-arch #{MacOS.preferred_arch}"
-      ENV.append 'LDFLAGS', "-arch #{MacOS.preferred_arch}"
+      ENV.append %w{CFLAGS LDFLAGS}, "-arch #{Hardware::CPU.arch_32_bit}"
     end
 
     system "./configure", *args
@@ -110,7 +120,8 @@ class Postgresql < Formula
     When installing the postgres gem, including ARCHFLAGS is recommended:
       ARCHFLAGS="-arch x86_64" gem install pg
 
-    To install gems without sudo, see the Homebrew wiki.
+    To install gems without sudo, see the Homebrew documentation:
+    https://github.com/Homebrew/homebrew/blob/master/share/doc/homebrew/Gems,-Eggs-and-Perl-Modules.md
     EOS
   end
 

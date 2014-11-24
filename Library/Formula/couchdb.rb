@@ -2,14 +2,14 @@ require "formula"
 
 class Couchdb < Formula
   homepage "http://couchdb.apache.org/"
-  url "http://www.apache.org/dyn/closer.cgi?path=/couchdb/source/1.6.0/apache-couchdb-1.6.0.tar.gz"
-  sha1 "62f99077c201ad632c1cd144fcaf6f10fa5949ed"
+  url "http://www.apache.org/dyn/closer.cgi?path=/couchdb/source/1.6.1/apache-couchdb-1.6.1.tar.gz"
+  sha1 "6275f3818579d7b307052e9735c42a8a64313229"
   revision 1
 
   bottle do
-    sha1 "814b75a6fd2a30738a34b8693d54a82cb0f64dad" => :mavericks
-    sha1 "f32b063573902ed3727f5611ca1476bb1bcb6818" => :mountain_lion
-    sha1 "aefe7f7ac800f761b335c990fe3e246e3ca9a00d" => :lion
+    sha1 "5de6d96453578bcb65a89dd68128efb856f8e99d" => :mavericks
+    sha1 "f1aeadfbc607c179a54d9c68f45dbb8eb85a57cd" => :mountain_lion
+    sha1 "8170817f314f8136ae2504ec58b7a936f1d316c7" => :lion
   end
 
   head do

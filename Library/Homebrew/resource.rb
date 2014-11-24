@@ -31,8 +31,15 @@ class Resource
     @downloader ||= download_strategy.new(download_name, self)
   end
 
+  # Removes /s from resource names; this allows go package names
+  # to be used as resource names without confusing software that
+  # interacts with download_name, e.g. github.com/foo/bar
+  def escaped_name
+    name.gsub("/", '-')
+  end
+
   def download_name
-    name.nil? ? owner.name : "#{owner.name}--#{name}"
+    name.nil? ? owner.name : "#{owner.name}--#{escaped_name}"
   end
 
   def cached_download
@@ -70,14 +77,15 @@ class Resource
     Partial.new(self, files)
   end
 
-  # For brew-fetch and others.
   def fetch
-    # Ensure the cache exists
     HOMEBREW_CACHE.mkpath
-    downloader.fetch
-  rescue ErrorDuringExecution, CurlDownloadStrategyError => e
-    raise DownloadError.new(self, e)
-  else
+
+    begin
+      downloader.fetch
+    rescue ErrorDuringExecution, CurlDownloadStrategyError => e
+      raise DownloadError.new(self, e)
+    end
+
     cached_download
   end
 
@@ -121,6 +129,12 @@ class Resource
     when Version then val
     else
       raise TypeError, "version '#{val.inspect}' should be a string"
+    end
+  end
+
+  class Go < Resource
+    def stage target
+      super(target/name)
     end
   end
 end
